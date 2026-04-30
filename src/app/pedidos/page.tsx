@@ -6,6 +6,7 @@ import { fetchOrders, updateOrderStatus } from '@/lib/api'
 import { formatCurrency, formatDate, ORDER_STATUS_CONFIG } from '@/lib/utils'
 import type { Order, OrderStatus } from '@/lib/types'
 import { ShoppingBag, ChevronDown, X, Package } from 'lucide-react'
+import Link from 'next/link'
 
 import { Topbar } from '@/components/layout/topbar'
 
