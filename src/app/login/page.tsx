@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { login } from './actions'
 import { KeyRound, Mail, Loader2, AlertCircle } from 'lucide-react'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -61,7 +62,12 @@ export default function LoginPage() {
           </div>
 
           <div className="input-group">
-            <label className="input-label" htmlFor="password">Contraseña</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8 }}>
+              <label className="input-label" htmlFor="password" style={{ marginBottom: 0 }}>Contraseña</label>
+              <Link href="/login/forgot-password" style={{ fontSize: '0.75rem', color: 'var(--accent)', textDecoration: 'none' }}>
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
             <div className="input-with-icon">
               <KeyRound className="input-icon" size={18} />
               <input

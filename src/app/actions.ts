@@ -231,3 +231,27 @@ export async function deleteUserAction(id: string) {
     return { success: false, error: error.message }
   }
 }
+
+export async function requestPasswordResetAction(email: string) {
+  try {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback?next=/login/update-password`,
+    })
+    if (error) throw error
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+}
+
+export async function updatePasswordAction(password: string) {
+  try {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) throw error
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+}

@@ -2,7 +2,7 @@ import { fetchProducts } from '@/lib/api'
 import { getDashboardStatsServer, getOrdersServer } from '@/app/actions'
 import { formatCurrency, formatDate, ORDER_STATUS_CONFIG } from '@/lib/utils'
 import { Package, ShoppingBag, TrendingUp, AlertTriangle, Boxes, Euro } from 'lucide-react'
-import Link from 'next/link'
+import { Topbar } from '@/components/layout/topbar'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,19 +23,15 @@ export default async function DashboardPage() {
 
   return (
     <>
-      {/* Top bar */}
-      <div className="topbar">
-        <div>
-          <div className="topbar-title">Dashboard</div>
-          <div className="topbar-subtitle">Resumen general del inventario</div>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Link href="/productos/nuevo" className="btn btn-primary btn-sm">
-            <Package size={14} />
-            Nuevo producto
-          </Link>
-        </div>
-      </div>
+      <Topbar 
+        title="Dashboard" 
+        subtitle="Resumen general del inventario"
+      >
+        <Link href="/productos/nuevo" className="btn btn-primary btn-sm">
+          <Package size={14} />
+          Nuevo producto
+        </Link>
+      </Topbar>
 
       <div className="page-body">
         {/* KPI Stats */}

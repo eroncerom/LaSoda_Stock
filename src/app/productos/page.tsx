@@ -19,6 +19,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
+import { Topbar } from '@/components/layout/topbar'
+
 type SortKey = 'nombre' | 'price' | 'stock'
 type SortDir = 'asc' | 'desc'
 
@@ -105,18 +107,15 @@ export default function ProductosPage() {
 
   return (
     <>
-      <div className="topbar">
-        <div>
-          <div className="topbar-title">Productos</div>
-          <div className="topbar-subtitle">
-            {filtered.length} productos · Valor: {formatCurrency(totalValue)}
-          </div>
-        </div>
+      <Topbar 
+        title="Productos" 
+        subtitle={`${filtered.length} productos · Valor: ${formatCurrency(totalValue)}`}
+      >
         <Link href="/productos/nuevo" className="btn btn-primary btn-sm">
           <Plus size={14} />
           Nuevo producto
         </Link>
-      </div>
+      </Topbar>
 
       <div className="page-body">
         {/* Filters toolbar */}

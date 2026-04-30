@@ -5,6 +5,8 @@ import { Users, Mail, Shield, User, Plus, Pencil, Trash2 } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { createUserAction, updateUserAction, deleteUserAction } from '@/app/actions'
 
+import { Topbar } from '@/components/layout/topbar'
+
 export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
   const [users, setUsers] = useState(initialUsers)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -95,16 +97,15 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
 
   return (
     <>
-      <div className="topbar">
-        <div>
-          <div className="topbar-title">Gestión de Usuarios</div>
-          <div className="topbar-subtitle">{users.length} gestores registrados</div>
-        </div>
+      <Topbar 
+        title="Gestión de Usuarios" 
+        subtitle={`${users.length} gestores registrados`}
+      >
         <button className="btn btn-primary btn-sm" onClick={() => openModal()}>
           <Plus size={14} />
           Nuevo usuario
         </button>
-      </div>
+      </Topbar>
 
       <div className="page-body">
         <div className="card">

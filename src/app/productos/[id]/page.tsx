@@ -7,6 +7,8 @@ import { formatCurrency, formatDate, getImageUrl } from '@/lib/utils'
 import { ArrowLeft, Save, Upload, X, Package, Tag, Boxes, Euro, Calendar } from 'lucide-react'
 import Link from 'next/link'
 
+import { Topbar } from '@/components/layout/topbar'
+
 export default function ProductoDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const queryClient = useQueryClient()
@@ -100,9 +102,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   if (isLoading) {
     return (
       <>
-        <div className="topbar">
-          <div className="topbar-title">Cargando...</div>
-        </div>
+        <Topbar title="Cargando..." />
         <div className="page-body">
           <div className="skeleton" style={{ height: 400, borderRadius: 16 }} />
         </div>
@@ -113,9 +113,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   if (!product || !form) {
     return (
       <>
-        <div className="topbar">
-          <div className="topbar-title">Producto no encontrado</div>
-        </div>
+        <Topbar title="Producto no encontrado" />
         <div className="page-body">
           <Link href="/productos" className="btn btn-ghost">← Volver</Link>
         </div>
@@ -127,17 +125,14 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
 
   return (
     <>
-      <div className="topbar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <Topbar 
+        title={product.nombre} 
+        subtitle="Editar producto"
+      >
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <Link href="/productos" className="btn btn-ghost btn-sm btn-icon">
             <ArrowLeft size={16} />
           </Link>
-          <div>
-            <div className="topbar-title">{product.nombre}</div>
-            <div className="topbar-subtitle">Editar producto</div>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {saved && (
             <span style={{ fontSize: '0.82rem', color: 'var(--status-ok)', animation: 'fadeIn 0.2s ease' }}>
               ✓ Guardado
@@ -152,7 +147,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             {mutation.isPending ? 'Guardando...' : 'Guardar cambios'}
           </button>
         </div>
-      </div>
+      </Topbar>
 
       <div className="page-body">
         {error && (

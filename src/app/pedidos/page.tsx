@@ -7,6 +7,8 @@ import { formatCurrency, formatDate, ORDER_STATUS_CONFIG } from '@/lib/utils'
 import type { Order, OrderStatus } from '@/lib/types'
 import { ShoppingBag, ChevronDown, X, Package } from 'lucide-react'
 
+import { Topbar } from '@/components/layout/topbar'
+
 const STATUS_OPTIONS: OrderStatus[] = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
 
 export default function PedidosPage() {
@@ -41,12 +43,10 @@ export default function PedidosPage() {
 
   return (
     <>
-      <div className="topbar">
-        <div>
-          <div className="topbar-title">Pedidos</div>
-          <div className="topbar-subtitle">{orders.length} pedidos en total</div>
-        </div>
-      </div>
+      <Topbar 
+        title="Pedidos" 
+        subtitle={`${orders.length} pedidos en total`}
+      />
 
       <div className="page-body">
         {/* Status filter pills */}

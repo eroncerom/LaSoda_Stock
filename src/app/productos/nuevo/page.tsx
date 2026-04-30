@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Upload, Camera, X, Package, CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
+import { Topbar } from '@/components/layout/topbar'
+
 export default function NuevoProductoPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -137,17 +139,14 @@ export default function NuevoProductoPage() {
 
   return (
     <>
-      <div className="topbar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Link href="/productos" className="btn btn-ghost btn-sm btn-icon">
-            <ArrowLeft size={16} />
-          </Link>
-          <div>
-            <div className="topbar-title">Nuevo producto</div>
-            <div className="topbar-subtitle">Añadir al catálogo de La Soda</div>
-          </div>
-        </div>
-      </div>
+      <Topbar 
+        title="Nuevo producto" 
+        subtitle="Añadir al catálogo de La Soda"
+      >
+        <Link href="/productos" className="btn btn-ghost btn-sm btn-icon">
+          <ArrowLeft size={16} />
+        </Link>
+      </Topbar>
 
       <div className="page-body" style={{ maxWidth: 720 }}>
         {error && (

@@ -5,6 +5,8 @@ import { fetchCategories, fetchProducts } from '@/lib/api'
 import { getImageUrl } from '@/lib/utils'
 import { Tag, Package, Image as ImageIcon } from 'lucide-react'
 
+import { Topbar } from '@/components/layout/topbar'
+
 export default function CategoriasPage() {
   const { data: categories = [], isLoading } = useQuery({
     queryKey: ['categories'],
@@ -29,12 +31,10 @@ export default function CategoriasPage() {
 
   return (
     <>
-      <div className="topbar">
-        <div>
-          <div className="topbar-title">Categorías</div>
-          <div className="topbar-subtitle">{categories.length} categorías activas</div>
-        </div>
-      </div>
+      <Topbar 
+        title="Categorías" 
+        subtitle={`${categories.length} categorías activas`}
+      />
 
       <div className="page-body">
         {isLoading ? (
