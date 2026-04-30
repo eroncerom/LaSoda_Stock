@@ -53,8 +53,8 @@ export default function OrderDetailClient({ order }: { order: Order }) {
         title={`Pedido #${order.id.slice(0, 8)}`} 
         subtitle="Gestión de pedido"
       >
-        <Link href="/pedidos" className="btn btn-ghost btn-sm btn-icon">
-          <ArrowLeft size={16} />
+        <Link href="/pedidos" className="btn btn-ghost btn-sm btn-icon" style={{ width: 40, height: 40 }}>
+          <ArrowLeft size={20} />
         </Link>
       </Topbar>
 

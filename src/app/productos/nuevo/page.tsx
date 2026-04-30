@@ -143,8 +143,8 @@ export default function NuevoProductoPage() {
         title="Nuevo producto" 
         subtitle="Añadir al catálogo de La Soda"
       >
-        <Link href="/productos" className="btn btn-ghost btn-sm btn-icon">
-          <ArrowLeft size={16} />
+        <Link href="/productos" className="btn btn-ghost btn-sm btn-icon" style={{ width: 40, height: 40 }}>
+          <ArrowLeft size={20} />
         </Link>
       </Topbar>
 

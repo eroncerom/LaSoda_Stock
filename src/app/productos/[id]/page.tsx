@@ -129,18 +129,24 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         title={product.nombre} 
         subtitle="Editar producto"
       >
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          <Link href="/productos" className="btn btn-ghost btn-sm btn-icon">
-            <ArrowLeft size={16} />
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <Link href="/productos" className="btn btn-ghost btn-sm btn-icon" style={{ width: 40, height: 40 }}>
+            <ArrowLeft size={20} />
           </Link>
           <button
-            className="btn btn-primary btn-sm"
+            className="btn btn-primary"
             disabled={mutation.isPending}
             onClick={() => mutation.mutate()}
-            style={{ padding: '0 12px' }}
+            style={{ 
+              height: 40, 
+              padding: '0 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
+            }}
           >
-            <Save size={14} />
-            <span className="hide-mobile">{mutation.isPending ? 'Guardando...' : 'Guardar'}</span>
+            <Save size={18} />
+            <span className="hide-mobile" style={{ fontWeight: 600 }}>{mutation.isPending ? 'Guardando...' : 'Guardar'}</span>
           </button>
         </div>
       </Topbar>
