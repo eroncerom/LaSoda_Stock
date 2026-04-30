@@ -647,3 +647,71 @@ select.input {
 .sidebar-close-btn {
   display: none !important;
 }
+
+/* Dashboard Action Center */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--bg-surface);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s ease;
+  min-height: 72px;
+}
+
+.action-item:hover {
+  background: var(--bg-hover);
+}
+
+.action-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.action-item-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.action-item-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+.action-item-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.action-item-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}

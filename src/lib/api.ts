@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import type { Product, Category, Order, OrderStatus } from '@/lib/types'
-import { getOrdersServer, getUsersServer, getDashboardStatsServer } from '@/app/actions'
+import { getOrdersServer, getUsersServer, getDashboardStatsServer, getOrderByIdServer } from '@/app/actions'
 
 // ─── PRODUCTS ──────────────────────────────────────────────────────────────
 
@@ -82,6 +82,10 @@ export async function fetchCategories(): Promise<Category[]> {
 
 export async function fetchOrders(): Promise<Order[]> {
   return await getOrdersServer()
+}
+
+export async function fetchOrderById(id: string): Promise<Order | null> {
+  return await getOrderByIdServer(id)
 }
 
 export async function updateOrderStatus(id: string, status: OrderStatus): Promise<Order> {

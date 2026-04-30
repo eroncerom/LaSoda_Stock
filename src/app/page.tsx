@@ -66,126 +66,76 @@ export default async function DashboardPage() {
             label="Pedidos pendientes"
             alert={(stats?.pendingOrders ?? 0) > 0}
           />
-          <StatCard
-            icon={<TrendingUp size={18} />}
-            iconBg="rgba(167,107,194,0.15)"
-            iconColor="#a76bc2"
-            value={formatCurrency(stats?.totalRevenue ?? 0)}
-            label="Ingresos totales"
-          />
         </div>
 
-        {/* Two column grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          {/* Low stock alert */}
-          <div className="card">
-            <div className="card-header">
+        {/* Dashboard Action Center */}
+        <div className="dashboard-grid">
+          {/* Low stock alerts */}
+          <div className="section">
+            <div className="section-header" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <AlertTriangle size={16} style={{ color: 'var(--status-warn)' }} />
-              <span style={{ fontSize: '0.88rem', fontWeight: 500 }}>Stock bajo</span>
-              <span style={{
-                marginLeft: 'auto',
-                fontSize: '0.75rem',
-                color: 'var(--text-tertiary)',
-              }}>
-                ≤ 3 unidades
-              </span>
+              <h2 style={{ fontSize: '0.9rem', fontWeight: 600 }}>Necesita Reposición</h2>
             </div>
+            
             {lowStockProducts.length === 0 ? (
-              <div className="empty-state" style={{ padding: '30px 20px' }}>
-                <Package size={28} />
-                <span style={{ fontSize: '0.83rem' }}>Todo el stock está bien</span>
+              <div className="card empty-state" style={{ padding: 40 }}>
+                <Package size={32} style={{ opacity: 0.3 }} />
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)' }}>Todo el stock está al día</p>
               </div>
             ) : (
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Producto</th>
-                    <th>Categoría</th>
-                    <th style={{ textAlign: 'right' }}>Stock</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {lowStockProducts.map((p) => (
-                    <tr key={p.id}>
-                      <td>
-                        <Link
-                          href={`/productos/${p.id}`}
-                          style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 450 }}
-                        >
-                          {p.nombre}
-                        </Link>
-                      </td>
-                      <td style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem' }}>
-                        {p.categories?.name ?? '—'}
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <span className={`badge ${p.stock === 0 ? 'badge-stock-empty' : 'badge-stock-low'}`}>
-                          {p.stock === 0 ? 'Sin stock' : `${p.stock} ud.`}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="action-list">
+                {lowStockProducts.map((p) => (
+                  <Link key={p.id} href={`/productos/${p.id}`} className="action-item">
+                    <div className="action-item-content">
+                      <span className="action-item-title">{p.nombre}</span>
+                      <span className="action-item-subtitle">{p.categories?.name ?? 'Sin categoría'}</span>
+                    </div>
+                    <div className="action-item-side">
+                      <span className={`badge ${p.stock === 0 ? 'badge-stock-empty' : 'badge-stock-low'}`}>
+                        {p.stock === 0 ? 'Agotado' : `${p.stock} ud.`}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             )}
           </div>
 
           {/* Recent orders */}
-          <div className="card">
-            <div className="card-header">
+          <div className="section">
+            <div className="section-header" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <ShoppingBag size={16} style={{ color: 'var(--accent)' }} />
-              <span style={{ fontSize: '0.88rem', fontWeight: 500 }}>Pedidos recientes</span>
-              <Link
-                href="/pedidos"
-                style={{
-                  marginLeft: 'auto',
-                  fontSize: '0.75rem',
-                  color: 'var(--accent)',
-                  textDecoration: 'none',
-                }}
-              >
+              <h2 style={{ fontSize: '0.9rem', fontWeight: 600 }}>Actividad de Pedidos</h2>
+              <Link href="/pedidos" style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--accent)', textDecoration: 'none' }}>
                 Ver todos →
               </Link>
             </div>
+
             {recentOrders.length === 0 ? (
-              <div className="empty-state" style={{ padding: '30px 20px' }}>
-                <ShoppingBag size={28} />
-                <span style={{ fontSize: '0.83rem' }}>No hay pedidos aún</span>
+              <div className="card empty-state" style={{ padding: 40 }}>
+                <ShoppingBag size={32} style={{ opacity: 0.3 }} />
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)' }}>No hay pedidos recientes</p>
               </div>
             ) : (
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Contacto</th>
-                    <th>Total</th>
-                    <th>Estado</th>
-                    <th>Fecha</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentOrders.map((o) => {
-                    const cfg = ORDER_STATUS_CONFIG[o.status] ?? ORDER_STATUS_CONFIG.pending
-                    return (
-                      <tr key={o.id}>
-                        <td style={{ maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {o.customer_contact ?? '—'}
-                        </td>
-                        <td style={{ fontWeight: 500, color: 'var(--text-primary)' }}>
-                          {formatCurrency(o.total_amount)}
-                        </td>
-                        <td>
-                          <span className={`badge status-${o.status}`}>
-                            {cfg.label}
-                          </span>
-                        </td>
-                        <td style={{ fontSize: '0.77rem', color: 'var(--text-tertiary)' }}>
-                          {formatDate(o.created_at)}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+              <div className="action-list">
+                {recentOrders.map((o) => {
+                  const cfg = ORDER_STATUS_CONFIG[o.status] ?? ORDER_STATUS_CONFIG.pending
+                  return (
+                    <Link key={o.id} href={`/pedidos/${o.id}`} className="action-item">
+                      <div className="action-item-content">
+                        <span className="action-item-title">{o.customer_contact || 'Pedido sin nombre'}</span>
+                        <span className="action-item-subtitle">{formatDate(o.created_at)}</span>
+                      </div>
+                      <div className="action-item-side">
+                        <span className="action-item-value">{formatCurrency(o.total_amount)}</span>
+                        <span className={`badge status-${o.status}`} style={{ fontSize: '0.7rem' }}>
+                          {cfg.label}
+                        </span>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
             )}
           </div>
         </div>

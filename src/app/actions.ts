@@ -255,3 +255,36 @@ export async function updatePasswordAction(password: string) {
     return { success: false, error: error.message }
   }
 }
+
+export async function updateOrderStatusAction(orderId: string, status: OrderStatus) {
+  try {
+    const adminSupabase = await createAdminClient()
+    const { error } = await adminSupabase
+      .from('orders')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', orderId)
+
+    if (error) throw error
+    return { success: true }
+  } catch (error: any) {
+    console.error('Error in updateOrderStatusAction:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+export async function getOrderByIdServer(id: string): Promise<Order | null> {
+  try {
+    const adminSupabase = await createAdminClient()
+    const { data, error } = await adminSupabase
+      .from('orders')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error) throw error
+    return data as Order
+  } catch (error) {
+    console.error('Error in getOrderByIdServer:', error)
+    return null
+  }
+}
