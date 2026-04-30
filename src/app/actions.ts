@@ -261,7 +261,7 @@ export async function updateOrderStatusAction(orderId: string, status: OrderStat
     const adminSupabase = await createAdminClient()
     const { error } = await adminSupabase
       .from('orders')
-      .update({ status, updated_at: new Date().toISOString() })
+      .update({ status })
       .eq('id', orderId)
 
     if (error) throw error

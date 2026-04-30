@@ -14,17 +14,29 @@ export default function OrderDetailClient({ order }: { order: Order }) {
   const [status, setStatus] = useState<OrderStatus>(order.status)
   const [updating, setUpdating] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleStatusChange(newStatus: OrderStatus) {
+    if (newStatus === status) return // No change needed
+    
     setUpdating(true)
-    const result = await updateOrderStatusAction(order.id, newStatus)
-    if (result.success) {
-      setStatus(newStatus)
-      setSuccess(true)
-      setTimeout(() => setSuccess(false), 2000)
-      router.refresh()
+    setError(null)
+    
+    try {
+      const result = await updateOrderStatusAction(order.id, newStatus)
+      if (result.success) {
+        setStatus(newStatus)
+        setSuccess(true)
+        setTimeout(() => setSuccess(false), 2000)
+        router.refresh()
+      } else {
+        setError(result.error || 'Error al actualizar el estado')
+      }
+    } catch (err: any) {
+      setError(err.message || 'Error de conexión')
+    } finally {
+      setUpdating(false)
     }
-    setUpdating(false)
   }
 
   const statusOptions: { value: OrderStatus; label: string; icon: any; color: string }[] = [
@@ -99,6 +111,7 @@ export default function OrderDetailClient({ order }: { order: Order }) {
                 <Clock size={16} style={{ color: 'var(--accent)' }} />
                 <span style={{ fontSize: '0.88rem', fontWeight: 600 }}>Estado del Pedido</span>
                 {success && <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--status-ok)' }}>✓ Actualizado</span>}
+                {error && <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--status-danger)' }}>{error}</span>}
               </div>
               <div style={{ padding: 8 }}>
                 <div className="action-list">
