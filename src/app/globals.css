@@ -644,6 +644,19 @@ select.input {
   }
 }
 
+/* Responsive Grid Layouts */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .sidebar-close-btn {
   display: none !important;
 }

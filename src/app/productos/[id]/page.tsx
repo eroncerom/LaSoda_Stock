@@ -129,82 +129,79 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         title={product.nombre} 
         subtitle="Editar producto"
       >
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <Link href="/productos" className="btn btn-ghost btn-sm btn-icon">
             <ArrowLeft size={16} />
           </Link>
-          {saved && (
-            <span style={{ fontSize: '0.82rem', color: 'var(--status-ok)', animation: 'fadeIn 0.2s ease' }}>
-              ✓ Guardado
-            </span>
-          )}
           <button
             className="btn btn-primary btn-sm"
             disabled={mutation.isPending}
             onClick={() => mutation.mutate()}
+            style={{ padding: '0 12px' }}
           >
             <Save size={14} />
-            {mutation.isPending ? 'Guardando...' : 'Guardar cambios'}
+            <span className="hide-mobile">{mutation.isPending ? 'Guardando...' : 'Guardar'}</span>
           </button>
         </div>
       </Topbar>
 
       <div className="page-body">
         {error && (
-          <div style={{
-            background: 'rgba(194,107,107,0.15)',
-            border: '1px solid rgba(194,107,107,0.3)',
-            borderRadius: 'var(--radius-md)',
-            padding: '12px 16px',
-            color: '#c26b6b',
-            fontSize: '0.85rem',
-            marginBottom: 20,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
+          <div className="error-banner">
             {error}
-            <button onClick={() => setError(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}>
+            <button onClick={() => setError(null)} className="error-close">
               <X size={14} />
             </button>
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 16 }}>
-          {/* Left: image + meta */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {/* Image */}
+        {saved && (
+          <div className="success-banner">
+            ✓ Cambios guardados correctamente
+          </div>
+        )}
+
+        <div className="responsive-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+          {/* Column 1: Image & Meta */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Image Card */}
             <div className="card">
-              <div className="card-header" style={{ paddingBottom: 14 }}>
-                <span style={{ fontSize: '0.82rem', fontWeight: 500 }}>Imagen</span>
+              <div className="card-header">
+                <Upload size={14} style={{ color: 'var(--accent)' }} />
+                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Imagen del producto</span>
               </div>
-              <div className="card-body" style={{ paddingTop: 12 }}>
+              <div className="card-body" style={{ padding: 16 }}>
                 <div
                   style={{
                     width: '100%',
                     aspectRatio: '1/1',
-                    borderRadius: 10,
+                    borderRadius: 12,
                     overflow: 'hidden',
                     background: 'var(--bg-elevated)',
                     border: '1px solid var(--border-subtle)',
-                    marginBottom: 12,
+                    marginBottom: 16,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    position: 'relative'
                   }}
                 >
                   {currentImageUrl !== '/placeholder-product.png' ? (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={currentImageUrl}
                       alt={product.nombre}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   ) : (
-                    <Package size={48} style={{ color: 'var(--text-tertiary)', opacity: 0.4 }} />
+                    <Package size={64} style={{ color: 'var(--text-tertiary)', opacity: 0.3 }} />
+                  )}
+                  {mutation.isPending && (
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div className="spinner" />
+                    </div>
                   )}
                 </div>
                 <button
                   className="btn btn-ghost"
-                  style={{ width: '100%', justifyContent: 'center' }}
+                  style={{ width: '100%', justifyContent: 'center', border: '1px dashed var(--border-default)' }}
                   onClick={() => fileRef.current?.click()}
                 >
                   <Upload size={14} />
@@ -224,53 +221,55 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-            {/* Meta info */}
+            {/* Meta Info Card */}
             <div className="card">
-              <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div className="card-header">
+                <Tag size={14} style={{ color: 'var(--accent)' }} />
+                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Información actual</span>
+              </div>
+              <div className="card-body" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, padding: 16 }}>
                 <MetaRow icon={<Tag size={14} />} label="Categoría" value={product.categories?.name ?? '—'} />
                 <MetaRow icon={<Euro size={14} />} label="Precio" value={formatCurrency(product.price)} />
-                <MetaRow icon={<Boxes size={14} />} label="Stock" value={`${product.stock} unidades`} />
-                <MetaRow
-                  icon={<Calendar size={14} />}
-                  label="Creado"
-                  value={formatDate(product.created_at)}
-                />
+                <MetaRow icon={<Boxes size={14} />} label="Stock" value={`${product.stock} ud.`} />
+                <MetaRow icon={<Calendar size={14} />} label="Registro" value={formatDate(product.created_at)} />
               </div>
             </div>
           </div>
 
-          {/* Right: edit form */}
+          {/* Column 2: Edit Form */}
           <div className="card">
             <div className="card-header">
               <Package size={16} style={{ color: 'var(--accent)' }} />
-              <span style={{ fontSize: '0.88rem', fontWeight: 500 }}>Editar información</span>
+              <span style={{ fontSize: '0.88rem', fontWeight: 600 }}>Editar detalles</span>
             </div>
-            <div className="card-body">
+            <div className="card-body" style={{ padding: 20 }}>
               <div className="form-grid">
                 <div className="full">
-                  <label className="input-label" htmlFor="edit-nombre">Nombre *</label>
+                  <label className="input-label" htmlFor="edit-nombre">Nombre del producto</label>
                   <input
                     id="edit-nombre"
                     className="input"
                     value={form.nombre}
                     onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                    placeholder="Ej. Botella de luz artesanal"
                   />
                 </div>
 
                 <div className="full">
-                  <label className="input-label" htmlFor="edit-desc">Descripción</label>
+                  <label className="input-label" htmlFor="edit-desc">Descripción detallada</label>
                   <textarea
                     id="edit-desc"
                     className="input"
                     rows={4}
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    style={{ resize: 'vertical', minHeight: 90 }}
+                    style={{ resize: 'vertical', minHeight: 120 }}
+                    placeholder="Describe los materiales, dimensiones..."
                   />
                 </div>
 
                 <div>
-                  <label className="input-label" htmlFor="edit-price">Precio (€) *</label>
+                  <label className="input-label" htmlFor="edit-price">Precio (€)</label>
                   <input
                     id="edit-price"
                     className="input"
@@ -283,7 +282,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 </div>
 
                 <div>
-                  <label className="input-label" htmlFor="edit-stock">Stock (unidades) *</label>
+                  <label className="input-label" htmlFor="edit-stock">Unidades en Stock</label>
                   <input
                     id="edit-stock"
                     className="input"
@@ -292,6 +291,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                     step="1"
                     value={form.stock}
                     onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                    style={{ fontWeight: 600, color: 'var(--accent)' }}
                   />
                 </div>
 
@@ -311,13 +311,22 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 </div>
 
                 {/* Stock quick actions */}
-                <div className="full">
-                  <label className="input-label">Ajuste rápido de stock</label>
-                  <div style={{ display: 'flex', gap: 8 }}>
+                <div className="full" style={{ marginTop: 8 }}>
+                  <label className="input-label">Ajuste rápido de inventario</label>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {[-5, -1, +1, +5, +10].map((delta) => (
                       <button
                         key={delta}
                         className="btn btn-ghost btn-sm"
+                        style={{ 
+                          flex: 1, 
+                          minWidth: 50, 
+                          height: 40,
+                          background: delta > 0 ? 'rgba(106,177,135,0.1)' : 'rgba(194,107,107,0.1)',
+                          color: delta > 0 ? '#6ab187' : '#c26b6b',
+                          borderColor: 'transparent',
+                          fontWeight: 600
+                        }}
                         onClick={() => {
                           const current = Number(form.stock)
                           const next = Math.max(0, current + delta)
@@ -334,6 +343,36 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .error-banner {
+          background: rgba(194,107,107,0.1);
+          border: 1px solid rgba(194,107,107,0.2);
+          border-radius: 8px;
+          padding: 12px 16px;
+          color: #c26b6b;
+          font-size: 0.85rem;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .error-close { background: none; border: none; cursor: pointer; color: inherit; padding: 4px; }
+        .success-banner {
+          background: rgba(106,177,135,0.1);
+          border: 1px solid rgba(106,177,135,0.2);
+          border-radius: 8px;
+          padding: 12px 16px;
+          color: #6ab187;
+          font-size: 0.85rem;
+          margin-bottom: 20px;
+          text-align: center;
+          font-weight: 500;
+        }
+        @media (max-width: 600px) {
+          .hide-mobile { display: none; }
+        }
+      `}</style>
     </>
   )
 }
