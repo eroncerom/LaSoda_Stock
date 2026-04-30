@@ -658,6 +658,65 @@ select.input {
   }
 }
 
+/* Order Cards for Mobile */
+.order-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, background 0.2s ease;
+  border: 1px solid var(--border-subtle);
+  gap: 12px;
+}
+
+.order-card:active {
+  transform: scale(0.98);
+  background: var(--bg-elevated);
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.order-card-id {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  background: var(--bg-base);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.order-card-contact {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+}
+
+.order-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.order-card-items {
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
+}
+
+.order-card-total {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
 @keyframes shimmer {
   from { background-position: 200% 0; }
   to { background-position: -200% 0; }

@@ -73,8 +73,8 @@ export default function PedidosPage() {
           })}
         </div>
 
-        {/* Table */}
-        <div className="card">
+        {/* Desktop Table View */}
+        <div className="card desktop-only-table">
           {isLoading ? (
             <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
               {Array.from({ length: 5 }).map((_, i) => (
@@ -128,13 +128,9 @@ export default function PedidosPage() {
                           </span>
                         </td>
                         <td>
-                          <button
-                            className="btn btn-ghost btn-sm"
-                            onClick={() => setSelectedOrder(o)}
-                            style={{ fontSize: '0.8rem' }}
-                          >
+                          <Link href={`/pedidos/${o.id}`} className="btn btn-ghost btn-sm" style={{ fontSize: '0.8rem' }}>
                             {itemCount} {itemCount === 1 ? 'artículo' : 'artículos'}
-                          </button>
+                          </Link>
                         </td>
                         <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
                           {formatCurrency(o.total_amount)}
@@ -151,12 +147,12 @@ export default function PedidosPage() {
                           {formatDate(o.created_at)}
                         </td>
                         <td>
-                          <button
+                          <Link
+                            href={`/pedidos/${o.id}`}
                             className="btn btn-ghost btn-sm"
-                            onClick={() => setSelectedOrder(o)}
                           >
                             Ver detalle
-                          </button>
+                          </Link>
                         </td>
                       </tr>
                     )
@@ -164,6 +160,43 @@ export default function PedidosPage() {
                 </tbody>
               </table>
             </div>
+          )}
+        </div>
+
+        {/* Mobile Order Grid */}
+        <div className="product-grid-mobile">
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="skeleton" style={{ height: 120, borderRadius: 16 }} />
+            ))
+          ) : filtered.length === 0 ? (
+            <div className="empty-state card">
+              <ShoppingBag size={40} />
+              <p>Sin pedidos</p>
+            </div>
+          ) : (
+            filtered.map((o) => {
+              const itemCount = Array.isArray(o.items) ? o.items.reduce((sum, item) => sum + item.quantity, 0) : 0
+              return (
+                <Link key={o.id} href={`/pedidos/${o.id}`} className="order-card">
+                  <div className="order-card-header">
+                    <div>
+                      <span className="order-card-id">#{o.id.slice(0, 8)}</span>
+                      <span className="order-card-contact">{o.customer_contact || 'Sin contacto'}</span>
+                    </div>
+                    <span className={`badge status-${o.status}`} style={{ fontSize: '0.7rem' }}>
+                      {ORDER_STATUS_CONFIG[o.status].label}
+                    </span>
+                  </div>
+                  <div className="order-card-meta">
+                    <div className="order-card-items">
+                      {itemCount} {itemCount === 1 ? 'artículo' : 'artículos'} · {formatDate(o.created_at)}
+                    </div>
+                    <span className="order-card-total">{formatCurrency(o.total_amount)}</span>
+                  </div>
+                </Link>
+              )
+            })
           )}
         </div>
       </div>
