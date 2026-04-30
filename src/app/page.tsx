@@ -3,6 +3,7 @@ import { getDashboardStatsServer, getOrdersServer } from '@/app/actions'
 import { formatCurrency, formatDate, ORDER_STATUS_CONFIG } from '@/lib/utils'
 import { Package, ShoppingBag, TrendingUp, AlertTriangle, Boxes, Euro } from 'lucide-react'
 import { Topbar } from '@/components/layout/topbar'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
