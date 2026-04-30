@@ -161,8 +161,8 @@ export default function ProductosPage() {
           </select>
         </div>
 
-        {/* Table */}
-        <div className="card">
+        {/* Desktop Table View */}
+        <div className="card desktop-only-table">
           {isLoading ? (
             <SkeletonTable />
           ) : filtered.length === 0 ? (
@@ -211,7 +211,6 @@ export default function ProductosPage() {
                     <tr key={p.id}>
                       <td>
                         {p.public_url || p.storage_path ? (
-                          // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={getImageUrl(p.storage_path, p.public_url)}
                             alt={p.nombre}
@@ -269,6 +268,56 @@ export default function ProductosPage() {
                 </tbody>
               </table>
             </div>
+          )}
+        </div>
+
+        {/* Mobile Grid View */}
+        <div className="product-grid-mobile">
+          {isLoading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="skeleton" style={{ height: 96, borderRadius: 16 }} />
+            ))
+          ) : filtered.length === 0 ? (
+            <div className="empty-state card">
+              <Package size={40} />
+              <p>No hay productos</p>
+            </div>
+          ) : (
+            filtered.map((p) => (
+              <Link key={p.id} href={`/productos/${p.id}`} className="product-card">
+                {p.public_url || p.storage_path ? (
+                  <img
+                    src={getImageUrl(p.storage_path, p.public_url)}
+                    alt={p.nombre}
+                    className="product-card-image"
+                  />
+                ) : (
+                  <div className="product-card-image" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <ImageIcon size={24} style={{ color: 'var(--text-tertiary)', opacity: 0.3 }} />
+                  </div>
+                )}
+                <div className="product-card-content">
+                  <span className="product-card-title">{p.nombre}</span>
+                  <span className="product-card-subtitle">{p.categories?.name || 'Sin categoría'}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {stockBadge(p.stock)}
+                  </div>
+                </div>
+                <div className="product-card-side">
+                  <span className="product-card-price">{formatCurrency(p.price)}</span>
+                  <button 
+                    className="btn btn-danger btn-sm btn-icon" 
+                    style={{ background: 'transparent', border: 'none', padding: 4 }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setDeleteTarget(p);
+                    }}
+                  >
+                    <Trash2 size={14} style={{ opacity: 0.5 }} />
+                  </button>
+                </div>
+              </Link>
+            ))
           )}
         </div>
       </div>
