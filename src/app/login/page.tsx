@@ -62,21 +62,7 @@ export default function LoginPage() {
           </div>
 
           <div className="input-group">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <label className="input-label" htmlFor="password" style={{ marginBottom: 0 }}>Contraseña</label>
-              <Link 
-                href="/login/forgot-password" 
-                style={{ 
-                  fontSize: '0.75rem', 
-                  color: 'var(--accent)', 
-                  textDecoration: 'none',
-                  fontWeight: 500,
-                  opacity: 0.8
-                }}
-              >
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
+            <label className="input-label" htmlFor="password">Contraseña</label>
             <div className="input-with-icon">
               <KeyRound className="input-icon" size={18} />
               <input
@@ -104,6 +90,19 @@ export default function LoginPage() {
 
         <div className="login-footer">
           <p>Si no tienes acceso, contacta con un superusuario.</p>
+          <Link 
+            href="/login/forgot-password" 
+            style={{ 
+              display: 'block',
+              marginTop: 12,
+              fontSize: '0.85rem', 
+              color: 'var(--accent)', 
+              textDecoration: 'none',
+              fontWeight: 500
+            }}
+          >
+            ¿Has olvidado tu contraseña?
+          </Link>
         </div>
       </div>
 
