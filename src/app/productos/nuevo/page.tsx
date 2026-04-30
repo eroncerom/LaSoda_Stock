@@ -69,7 +69,8 @@ export default function NuevoProductoPage() {
           price: Number(form.price),
           stock: Number(form.stock),
           category_id: form.category_id || null,
-          ...(imageData ?? {}),
+          storage_path: imageData?.storage_path || null,
+          public_url: imageData?.public_url || null,
         })
       } finally {
         setIsUploading(false)
