@@ -4,7 +4,7 @@ import { use, useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { fetchProductById, fetchCategories, updateProduct, uploadProductImage } from '@/lib/api'
 import { formatCurrency, formatDate, getImageUrl } from '@/lib/utils'
-import { ArrowLeft, Save, Upload, X, Package, Tag, Boxes, Euro, Calendar } from 'lucide-react'
+import { ArrowLeft, Save, Upload, X, Package, Tag, Boxes, Euro, Calendar, Camera } from 'lucide-react'
 import Link from 'next/link'
 
 import { Topbar } from '@/components/layout/topbar'
@@ -97,6 +97,20 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
     const reader = new FileReader()
     reader.onload = () => setImagePreview(reader.result as string)
     reader.readAsDataURL(file)
+  }
+
+  const triggerCamera = () => {
+    if (fileRef.current) {
+      fileRef.current.setAttribute('capture', 'environment')
+      fileRef.current.click()
+    }
+  }
+
+  const triggerUpload = () => {
+    if (fileRef.current) {
+      fileRef.current.removeAttribute('capture')
+      fileRef.current.click()
+    }
   }
 
   if (isLoading) {
@@ -205,19 +219,30 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                     </div>
                   )}
                 </div>
-                <button
-                  className="btn btn-ghost"
-                  style={{ width: '100%', justifyContent: 'center', border: '1px dashed var(--border-default)' }}
-                  onClick={() => fileRef.current?.click()}
-                >
-                  <Upload size={14} />
-                  Cambiar imagen
-                </button>
+                
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    className="btn btn-ghost"
+                    style={{ flex: 1, justifyContent: 'center', border: '1px dashed var(--border-default)', fontSize: '0.85rem' }}
+                    onClick={triggerCamera}
+                  >
+                    <Camera size={14} />
+                    Cámara
+                  </button>
+                  <button
+                    className="btn btn-ghost"
+                    style={{ flex: 1, justifyContent: 'center', border: '1px dashed var(--border-default)', fontSize: '0.85rem' }}
+                    onClick={triggerUpload}
+                  >
+                    <Upload size={14} />
+                    Galería
+                  </button>
+                </div>
+                
                 <input
                   ref={fileRef}
                   type="file"
                   accept="image/*"
-                  capture="environment"
                   style={{ display: 'none' }}
                   onChange={(e) => {
                     const file = e.target.files?.[0]
