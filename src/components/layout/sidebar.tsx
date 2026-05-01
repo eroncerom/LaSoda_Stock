@@ -30,33 +30,29 @@ const NAV_BOTTOM = [
   { href: '/ajustes', label: 'Ajustes', icon: Settings },
 ]
 
-import { getCurrentRole } from '@/app/actions'
+import { getCurrentRole, getUserProfile } from '@/app/actions'
 
 export function Sidebar() {
   const pathname = usePathname()
   const { isOpen, setIsOpen } = useSidebar()
   const [role, setRole] = useState<string | null>(null)
   const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [fullName, setFullName] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchUser = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user?.email) setUserEmail(user.email)
-    }
-    fetchUser()
-  }, [])
-
-  useEffect(() => {
-    const fetchRole = async () => {
       try {
-        const userRole = await getCurrentRole()
-        if (userRole) setRole(userRole)
+        const profile = await getUserProfile()
+        if (profile) {
+          setUserEmail(profile.email)
+          setRole(profile.role)
+          setFullName(profile.full_name)
+        }
       } catch (err) {
-        // Error logging removed
+        // Error silent
       }
     }
-    fetchRole()
+    fetchUser()
   }, [pathname])
 
   // Close sidebar when pathname changes (navigation)
@@ -158,7 +154,7 @@ export function Sidebar() {
         }}>
           <div style={{ fontSize: '0.73rem', color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
             <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
-              {userEmail || 'Cargando...'}
+              {fullName || userEmail || 'Cargando...'}
             </span>
             <br />
             <span style={{ 

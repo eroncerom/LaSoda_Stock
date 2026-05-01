@@ -24,6 +24,46 @@ export async function getCurrentRole() {
   }
 }
 
+export async function getUserProfile() {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return null
+
+    const adminSupabase = await createAdminClient()
+    const { data: profile } = await adminSupabase
+      .from('profiles')
+      .select('id, role, full_name, email')
+      .eq('id', user.id)
+      .single()
+
+    return profile || null
+  } catch (error) {
+    console.error('Error in getUserProfile:', error)
+    return null
+  }
+}
+
+export async function updateProfileName(fullName: string) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
+
+    const adminSupabase = await createAdminClient()
+    const { error } = await adminSupabase
+      .from('profiles')
+      .update({ full_name: fullName })
+      .eq('id', user.id)
+
+    if (error) throw error
+    return { success: true }
+  } catch (error: any) {
+    console.error('Error in updateProfileName:', error)
+    return { success: false, error: error.message }
+  }
+}
+
 export async function getOrdersServer(): Promise<Order[]> {
   try {
     const adminSupabase = await createAdminClient()
