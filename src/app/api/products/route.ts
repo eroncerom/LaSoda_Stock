@@ -1,8 +1,50 @@
 import { NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import { createAdminClient } from '@/lib/supabase/admin'
+
+async function checkPermission() {
+  try {
+    const cookieStore = await cookies()
+    const supabaseAuth = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+          setAll() {},
+        },
+      }
+    )
+    
+    const { data: { user } } = await supabaseAuth.auth.getUser()
+    if (!user) return { authorized: false, error: 'Unauthorized', status: 401 }
+
+    const supabaseAdmin = await createAdminClient()
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role !== 'superuser' && profile?.role !== 'db_manager') {
+      return { authorized: false, error: 'Forbidden', status: 403 }
+    }
+
+    return { authorized: true }
+  } catch (error) {
+    console.error('Error in checkPermission:', error)
+    return { authorized: false, error: 'Internal Server Error', status: 500 }
+  }
+}
 
 export async function POST(request: Request) {
   try {
+    const auth = await checkPermission()
+    if (!auth.authorized) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
+    }
+
     const productData = await request.json()
     const supabase = await createAdminClient()
 
@@ -31,6 +73,11 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    const auth = await checkPermission()
+    if (!auth.authorized) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
+    }
+
     const { id, ...updates } = await request.json()
     const supabase = await createAdminClient()
 
@@ -65,6 +112,11 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const auth = await checkPermission()
+    if (!auth.authorized) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status })
+    }
+
     const supabase = await createAdminClient()
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
