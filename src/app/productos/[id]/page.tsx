@@ -517,7 +517,6 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                     value={form.category_id}
                     onChange={(e) => setForm({ ...form, category_id: e.target.value })}
                   >
-                    <option value="">Sin categoría</option>
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>{formatCategoryName(c.name)}</option>
                     ))}
