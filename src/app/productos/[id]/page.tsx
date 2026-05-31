@@ -2,9 +2,9 @@
 
 import { use, useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { fetchProductById, fetchCategories, updateProduct, uploadProductImage } from '@/lib/api'
+import { fetchProductById, fetchCategories, updateProduct, uploadProductImage, fetchProductGallery, uploadGalleryImage, deleteGalleryImage } from '@/lib/api'
 import { formatCurrency, formatDate, getImageUrl } from '@/lib/utils'
-import { ArrowLeft, Save, Upload, X, Package, Tag, Boxes, Euro, Calendar, Camera } from 'lucide-react'
+import { ArrowLeft, Save, Upload, X, Package, Tag, Boxes, Euro, Calendar, Camera, Image as ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 
 import { Topbar } from '@/components/layout/topbar'
@@ -17,6 +17,56 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', id],
     queryFn: () => fetchProductById(id),
+  })
+
+  const { data: gallery = [], refetch: refetchGallery } = useQuery({
+    queryKey: ['product-gallery', id],
+    queryFn: async () => {
+      if (!product) return []
+      const pathParts = product.storage_path ? product.storage_path.split('/') : []
+      const categorySlug = pathParts[0] || 'sin-categoria'
+      const productsIndex = pathParts.findIndex(p => p.toLowerCase() === 'products' || p.toLowerCase() === 'productos')
+      const productSlug = (productsIndex !== -1 && pathParts[productsIndex + 1]) 
+        ? pathParts[productsIndex + 1] 
+        : product.nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+      return fetchProductGallery(categorySlug, productSlug)
+    },
+    enabled: !!product,
+  })
+
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false)
+  const galleryFileRef = useRef<HTMLInputElement>(null)
+
+  const uploadGalleryMutation = useMutation({
+    mutationFn: async (file: File) => {
+      if (!product) return
+      setIsUploadingGallery(true)
+      try {
+        const pathParts = product.storage_path ? product.storage_path.split('/') : []
+        const categorySlug = pathParts[0] || 'sin-categoria'
+        const productsIndex = pathParts.findIndex(p => p.toLowerCase() === 'products' || p.toLowerCase() === 'productos')
+        const productSlug = (productsIndex !== -1 && pathParts[productsIndex + 1]) 
+          ? pathParts[productsIndex + 1] 
+          : product.nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+        await uploadGalleryImage(file, categorySlug, productSlug)
+      } finally {
+        setIsUploadingGallery(false)
+      }
+    },
+    onSuccess: () => {
+      refetchGallery()
+    },
+    onError: (err: Error) => setError(err.message)
+  })
+
+  const deleteGalleryMutation = useMutation({
+    mutationFn: async (filePath: string) => {
+      await deleteGalleryImage(filePath)
+    },
+    onSuccess: () => {
+      refetchGallery()
+    },
+    onError: (err: Error) => setError(err.message)
   })
 
   const { data: categories = [] } = useQuery({
@@ -247,6 +297,139 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                   onChange={(e) => {
                     const file = e.target.files?.[0]
                     if (file) handleImageChange(file)
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Gallery Manager Card */}
+            <div className="card">
+              <div className="card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <ImageIcon size={14} style={{ color: 'var(--accent)' }} />
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Galería del producto</span>
+                </div>
+                {gallery.length > 0 && (
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>{gallery.length} fotos</span>
+                )}
+              </div>
+              <div className="card-body" style={{ padding: 16 }}>
+                
+                {/* Images grid */}
+                <div 
+                  style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))', 
+                    gap: 10,
+                    marginBottom: 16,
+                    minHeight: gallery.length === 0 ? 'auto' : 80
+                  }}
+                >
+                  {gallery.map((img, idx) => (
+                    <div 
+                      key={idx} 
+                      style={{ 
+                        position: 'relative', 
+                        aspectRatio: '1/1', 
+                        borderRadius: 8, 
+                        overflow: 'hidden', 
+                        border: '1px solid var(--border-subtle)',
+                        background: 'var(--bg-elevated)'
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src={img.publicUrl} 
+                        alt="" 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => deleteGalleryMutation.mutate(img.path)}
+                        disabled={deleteGalleryMutation.isPending}
+                        className="btn btn-danger btn-sm btn-icon"
+                        style={{ 
+                          position: 'absolute', 
+                          top: 2, 
+                          right: 2, 
+                          width: 24, 
+                          height: 24, 
+                          padding: 0, 
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.4)',
+                          zIndex: 5
+                        }}
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Empty state or upload spinner */}
+                  {(uploadGalleryMutation.isPending || isUploadingGallery) && (
+                    <div 
+                      style={{ 
+                        aspectRatio: '1/1', 
+                        borderRadius: 8, 
+                        background: 'rgba(0,0,0,0.3)', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        border: '1px dashed var(--border-subtle)'
+                      }}
+                    >
+                      <div className="spinner" style={{ width: 20, height: 20 }} />
+                    </div>
+                  )}
+                </div>
+
+                {gallery.length === 0 && !uploadGalleryMutation.isPending && !isUploadingGallery && (
+                  <div style={{ textAlign: 'center', padding: '16px 8px', color: 'var(--text-tertiary)', fontSize: '0.8rem', border: '1px dashed var(--border-subtle)', borderRadius: 8, marginBottom: 16 }}>
+                    No hay imágenes secundarias
+                  </div>
+                )}
+
+                {/* Touch actions for upload */}
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    className="btn btn-ghost"
+                    style={{ flex: 1, justifyContent: 'center', border: '1px dashed var(--border-default)', fontSize: '0.82rem', height: 40 }}
+                    onClick={() => {
+                      if (galleryFileRef.current) {
+                        galleryFileRef.current.setAttribute('capture', 'environment')
+                        galleryFileRef.current.click()
+                      }
+                    }}
+                  >
+                    <Camera size={14} />
+                    Cámara
+                  </button>
+                  <button
+                    className="btn btn-ghost"
+                    style={{ flex: 1, justifyContent: 'center', border: '1px dashed var(--border-default)', fontSize: '0.82rem', height: 40 }}
+                    onClick={() => {
+                      if (galleryFileRef.current) {
+                        galleryFileRef.current.removeAttribute('capture')
+                        galleryFileRef.current.click()
+                      }
+                    }}
+                  >
+                    <Upload size={14} />
+                    Añadir foto
+                  </button>
+                </div>
+
+                <input
+                  ref={galleryFileRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) uploadGalleryMutation.mutate(file)
                   }}
                 />
               </div>

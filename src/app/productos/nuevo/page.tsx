@@ -2,9 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { fetchCategories, createProduct, uploadProductImage } from '@/lib/api'
+import { fetchCategories, createProduct, uploadProductImage, uploadGalleryImage } from '@/lib/api'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Upload, Camera, X, Package, CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Upload, Camera, X, Package, CheckCircle2, Loader2, AlertCircle, Image as ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 
 import { Topbar } from '@/components/layout/topbar'
@@ -23,6 +23,9 @@ export default function NuevoProductoPage() {
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([])
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([])
+  const galleryFileRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -65,7 +68,7 @@ export default function NuevoProductoPage() {
           await new Promise(resolve => setTimeout(resolve, 500))
         }
 
-        return await createProduct({
+        const createdProduct = await createProduct({
           nombre: form.nombre.trim(),
           description: form.description.trim() || null,
           price: Number(form.price),
@@ -74,6 +77,18 @@ export default function NuevoProductoPage() {
           storage_path: imageData?.storage_path || null,
           public_url: imageData?.public_url || null,
         })
+
+        if (galleryFiles.length > 0 && createdProduct) {
+          const category = categories.find((c) => c.id === form.category_id)
+          const slug = category?.slug ?? 'sin-categoria'
+          const productSlug = form.nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+          
+          for (const file of galleryFiles) {
+            await uploadGalleryImage(file, slug, productSlug)
+          }
+        }
+
+        return createdProduct
       } finally {
         setIsUploading(false)
       }
@@ -122,6 +137,45 @@ export default function NuevoProductoPage() {
     if (fileRef.current) {
       fileRef.current.removeAttribute('capture')
       fileRef.current.click()
+    }
+  }
+
+  function handleGalleryImagesChange(files: FileList | null) {
+    if (!files) return
+    const validFiles: File[] = []
+    const newPreviews: string[] = []
+
+    Array.from(files).forEach((file) => {
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Una de las imágenes supera los 5MB')
+        return
+      }
+      validFiles.push(file)
+      newPreviews.push(URL.createObjectURL(file))
+    })
+
+    setGalleryFiles(prev => [...prev, ...validFiles])
+    setGalleryPreviews(prev => [...prev, ...newPreviews])
+    setError(null)
+  }
+
+  function removeGalleryImage(index: number) {
+    setGalleryFiles(prev => prev.filter((_, i) => i !== index))
+    URL.revokeObjectURL(galleryPreviews[index])
+    setGalleryPreviews(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const triggerGalleryCamera = () => {
+    if (galleryFileRef.current) {
+      galleryFileRef.current.setAttribute('capture', 'environment')
+      galleryFileRef.current.click()
+    }
+  }
+
+  const triggerGalleryUpload = () => {
+    if (galleryFileRef.current) {
+      galleryFileRef.current.removeAttribute('capture')
+      galleryFileRef.current.click()
     }
   }
 
@@ -259,6 +313,124 @@ export default function NuevoProductoPage() {
                     const file = e.target.files?.[0]
                     if (file) handleImageChange(file)
                   }}
+                />
+              </div>
+
+              {/* Multi-image Gallery upload */}
+              <div className="full" style={{ marginTop: 8 }}>
+                <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <ImageIcon size={14} style={{ color: 'var(--accent)' }} />
+                  Galería de imágenes secundarias (Opcional)
+                </label>
+                <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: 12 }}>
+                  Imágenes adicionales que se mostrarán en el carrusel táctil del producto.
+                </span>
+
+                <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                  
+                  {/* Grid layout for gallery images */}
+                  <div 
+                    style={{
+                      flex: 1,
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
+                      gap: 12,
+                      minHeight: 80,
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: 12,
+                      padding: 12,
+                      width: '100%'
+                    }}
+                  >
+                    {galleryPreviews.map((src, idx) => (
+                      <div 
+                        key={idx} 
+                        style={{ 
+                          position: 'relative', 
+                          aspectRatio: '1/1', 
+                          borderRadius: 8, 
+                          overflow: 'hidden', 
+                          border: '1px solid var(--border-subtle)',
+                          background: 'var(--bg-base)'
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImage(idx)}
+                          className="btn btn-danger btn-sm btn-icon"
+                          style={{ 
+                            position: 'absolute', 
+                            top: 2, 
+                            right: 2, 
+                            width: 24, 
+                            height: 24, 
+                            padding: 0, 
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+                          }}
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Big plus trigger inside grid */}
+                    <div 
+                      onClick={triggerGalleryUpload}
+                      style={{
+                        aspectRatio: '1/1',
+                        borderRadius: 8,
+                        border: '2px dashed var(--border-strong)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        color: 'var(--text-tertiary)',
+                        gap: 4
+                      }}
+                    >
+                      <Upload size={18} />
+                      <span style={{ fontSize: '0.62rem', fontWeight: 600 }}>Añadir</span>
+                    </div>
+                  </div>
+
+                  {/* Actions column for quick mobile tapping */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 120 }}>
+                    <button 
+                      type="button" 
+                      onClick={triggerGalleryCamera} 
+                      className="btn btn-ghost"
+                      style={{ padding: '12px', justifyContent: 'center', fontSize: '0.85rem' }}
+                    >
+                      <Camera size={16} />
+                      Cámara
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={triggerGalleryUpload} 
+                      className="btn btn-ghost"
+                      style={{ padding: '12px', justifyContent: 'center', fontSize: '0.85rem' }}
+                    >
+                      <Upload size={16} />
+                      Galería
+                    </button>
+                  </div>
+                </div>
+
+                <input
+                  ref={galleryFileRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={(e) => handleGalleryImagesChange(e.target.files)}
                 />
               </div>
 

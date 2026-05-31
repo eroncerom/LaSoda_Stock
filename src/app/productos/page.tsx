@@ -20,6 +20,7 @@ import {
 import Link from 'next/link'
 
 import { Topbar } from '@/components/layout/topbar'
+import ProductGalleryModal from '@/components/products/ProductGalleryModal'
 
 type SortKey = 'nombre' | 'price' | 'stock'
 type SortDir = 'asc' | 'desc'
@@ -32,6 +33,7 @@ export default function ProductosPage() {
   const [sortKey, setSortKey] = useState<SortKey>('nombre')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null)
+  const [selectedGalleryProduct, setSelectedGalleryProduct] = useState<Product | null>(null)
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],
@@ -215,9 +217,15 @@ export default function ProductosPage() {
                             src={getImageUrl(p.storage_path, p.public_url)}
                             alt={p.nombre}
                             className="product-thumb"
+                            onClick={() => setSelectedGalleryProduct(p)}
+                            style={{ cursor: 'pointer' }}
                           />
                         ) : (
-                          <div className="product-thumb" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div 
+                            className="product-thumb" 
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                            onClick={() => setSelectedGalleryProduct(p)}
+                          >
                             <ImageIcon size={16} style={{ color: 'var(--text-tertiary)' }} />
                           </div>
                         )}
@@ -290,9 +298,23 @@ export default function ProductosPage() {
                     src={getImageUrl(p.storage_path, p.public_url)}
                     alt={p.nombre}
                     className="product-card-image"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setSelectedGalleryProduct(p)
+                    }}
+                    style={{ cursor: 'pointer' }}
                   />
                 ) : (
-                  <div className="product-card-image" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div 
+                    className="product-card-image" 
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setSelectedGalleryProduct(p)
+                    }}
+                  >
                     <ImageIcon size={24} style={{ color: 'var(--text-tertiary)', opacity: 0.3 }} />
                   </div>
                 )}
@@ -350,6 +372,14 @@ export default function ProductosPage() {
             </div>
           </div>
         </div>
+      )}
+      
+      {/* Product gallery zoom viewer */}
+      {selectedGalleryProduct && (
+        <ProductGalleryModal 
+          product={selectedGalleryProduct} 
+          onClose={() => setSelectedGalleryProduct(null)} 
+        />
       )}
     </>
   )

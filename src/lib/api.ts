@@ -123,6 +123,52 @@ export async function uploadProductImage(
   return res.json()
 }
 
+export async function fetchProductGallery(
+  categorySlug: string,
+  productSlug: string
+): Promise<{ name: string; path: string; publicUrl: string }[]> {
+  const res = await fetch(`/api/gallery?categorySlug=${categorySlug}&productSlug=${productSlug}`)
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error fetching gallery')
+  }
+  return res.json()
+}
+
+export async function uploadGalleryImage(
+  file: File,
+  categorySlug: string,
+  productSlug: string
+): Promise<{ path: string; publicUrl: string }> {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('categorySlug', categorySlug)
+  formData.append('productSlug', productSlug)
+
+  const res = await fetch('/api/gallery', {
+    method: 'POST',
+    body: formData,
+  })
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error uploading gallery image')
+  }
+
+  return res.json()
+}
+
+export async function deleteGalleryImage(filePath: string): Promise<void> {
+  const res = await fetch(`/api/gallery?filePath=${encodeURIComponent(filePath)}`, {
+    method: 'DELETE',
+  })
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.error || 'Error deleting gallery image')
+  }
+}
+
+
 // ─── DASHBOARD STATS ───────────────────────────────────────────────────────
 
 export async function fetchDashboardStats() {

@@ -1,7 +1,7 @@
 import { fetchProducts } from '@/lib/api'
 import { getDashboardStatsServer, getOrdersServer } from '@/app/actions'
-import { formatCurrency, formatDate, ORDER_STATUS_CONFIG } from '@/lib/utils'
-import { Package, ShoppingBag, TrendingUp, AlertTriangle, Boxes, Euro } from 'lucide-react'
+import { formatCurrency, formatDate, ORDER_STATUS_CONFIG, getImageUrl } from '@/lib/utils'
+import { Package, ShoppingBag, TrendingUp, AlertTriangle, Boxes, Euro, Image as ImageIcon } from 'lucide-react'
 import { Topbar } from '@/components/layout/topbar'
 import Link from 'next/link'
 
@@ -85,7 +85,19 @@ export default async function DashboardPage() {
             ) : (
               <div className="action-list">
                 {lowStockProducts.map((p) => (
-                  <Link key={p.id} href={`/productos/${p.id}`} className="action-item">
+                  <Link key={p.id} href={`/productos/${p.id}`} className="action-item" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    {p.public_url || p.storage_path ? (
+                      <img
+                        src={getImageUrl(p.storage_path, p.public_url)}
+                        alt={p.nombre}
+                        className="product-thumb"
+                        style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }}
+                      />
+                    ) : (
+                      <div className="product-thumb" style={{ width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-secondary)', flexShrink: 0 }}>
+                        <ImageIcon size={14} style={{ color: 'var(--text-tertiary)' }} />
+                      </div>
+                    )}
                     <div className="action-item-content">
                       <span className="action-item-title">{p.nombre}</span>
                       <span className="action-item-subtitle">{p.categories?.name ?? 'Sin categoría'}</span>
