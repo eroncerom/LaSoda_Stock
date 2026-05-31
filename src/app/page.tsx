@@ -1,6 +1,6 @@
 import { fetchProducts } from '@/lib/api'
 import { getDashboardStatsServer, getOrdersServer } from '@/app/actions'
-import { formatCurrency, formatDate, ORDER_STATUS_CONFIG, getImageUrl } from '@/lib/utils'
+import { formatCurrency, formatDate, ORDER_STATUS_CONFIG, getImageUrl, formatCategoryName } from '@/lib/utils'
 import { Package, ShoppingBag, TrendingUp, AlertTriangle, Boxes, Euro, Image as ImageIcon } from 'lucide-react'
 import { Topbar } from '@/components/layout/topbar'
 import Link from 'next/link'
@@ -100,7 +100,7 @@ export default async function DashboardPage() {
                     )}
                     <div className="action-item-content">
                       <span className="action-item-title">{p.nombre}</span>
-                      <span className="action-item-subtitle">{p.categories?.name ?? 'Sin categoría'}</span>
+                      <span className="action-item-subtitle">{formatCategoryName(p.categories?.name)}</span>
                     </div>
                     <div className="action-item-side">
                       <span className={`badge ${p.stock === 0 ? 'badge-stock-empty' : 'badge-stock-low'}`}>

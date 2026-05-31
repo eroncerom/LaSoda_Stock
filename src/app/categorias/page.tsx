@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { fetchCategories, fetchProducts } from '@/lib/api'
-import { getImageUrl } from '@/lib/utils'
+import { getImageUrl, formatCategoryName } from '@/lib/utils'
 import { Tag, Package, Image as ImageIcon } from 'lucide-react'
 
 import { Topbar } from '@/components/layout/topbar'
@@ -63,7 +63,7 @@ export default function CategoriasPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={cat.image_url}
-                        alt={cat.name}
+                        alt={formatCategoryName(cat.name)}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                     ) : (
@@ -77,7 +77,7 @@ export default function CategoriasPage() {
                       background: 'linear-gradient(to top, rgba(17,17,24,0.9) 0%, transparent 60%)',
                     }} />
                     <div style={{ position: 'absolute', bottom: 12, left: 14 }}>
-                      <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-primary)' }}>{cat.name}</div>
+                      <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-primary)' }}>{formatCategoryName(cat.name)}</div>
                       <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: 2 }}>/{cat.slug}</div>
                     </div>
                   </div>

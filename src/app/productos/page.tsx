@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { fetchProducts, fetchCategories, deleteProduct, updateProduct } from '@/lib/api'
-import { formatCurrency, getImageUrl } from '@/lib/utils'
+import { formatCurrency, getImageUrl, formatCategoryName } from '@/lib/utils'
 import type { Product } from '@/lib/types'
 import {
   Search,
@@ -144,7 +144,7 @@ export default function ProductosPage() {
           >
             <option value="all">Todas las categorías</option>
             {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+              <option key={c.id} value={c.id}>{formatCategoryName(c.name)}</option>
             ))}
           </select>
 
@@ -244,7 +244,7 @@ export default function ProductosPage() {
                         )}
                       </td>
                       <td style={{ fontSize: '0.82rem' }}>
-                        {p.categories?.name ?? <span style={{ color: 'var(--text-tertiary)' }}>—</span>}
+                        {p.categories?.name ? formatCategoryName(p.categories.name) : <span style={{ color: 'var(--text-tertiary)' }}>—</span>}
                       </td>
                       <td style={{ fontWeight: 500, color: 'var(--text-primary)' }}>
                         {formatCurrency(p.price)}
@@ -320,7 +320,7 @@ export default function ProductosPage() {
                 )}
                 <div className="product-card-content">
                   <span className="product-card-title">{p.nombre}</span>
-                  <span className="product-card-subtitle">{p.categories?.name || 'Sin categoría'}</span>
+                  <span className="product-card-subtitle">{formatCategoryName(p.categories?.name)}</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     {stockBadge(p.stock)}
                   </div>

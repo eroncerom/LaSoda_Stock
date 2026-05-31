@@ -3,7 +3,7 @@
 import { use, useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { fetchProductById, fetchCategories, updateProduct, uploadProductImage, fetchProductGallery, uploadGalleryImage, deleteGalleryImage } from '@/lib/api'
-import { formatCurrency, formatDate, getImageUrl } from '@/lib/utils'
+import { formatCurrency, formatDate, getImageUrl, formatCategoryName } from '@/lib/utils'
 import { ArrowLeft, Save, Upload, X, Package, Tag, Boxes, Euro, Calendar, Camera, Image as ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 
@@ -442,7 +442,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Información actual</span>
               </div>
               <div className="card-body" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, padding: 16 }}>
-                <MetaRow icon={<Tag size={14} />} label="Categoría" value={product.categories?.name ?? '—'} />
+                <MetaRow icon={<Tag size={14} />} label="Categoría" value={formatCategoryName(product.categories?.name)} />
                 <MetaRow icon={<Euro size={14} />} label="Precio" value={formatCurrency(product.price)} />
                 <MetaRow icon={<Boxes size={14} />} label="Stock" value={`${product.stock} ud.`} />
                 <MetaRow icon={<Calendar size={14} />} label="Registro" value={formatDate(product.created_at)} />
@@ -519,7 +519,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                   >
                     <option value="">Sin categoría</option>
                     {categories.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
+                      <option key={c.id} value={c.id}>{formatCategoryName(c.name)}</option>
                     ))}
                   </select>
                 </div>

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { fetchCategories, createProduct, uploadProductImage, uploadGalleryImage } from '@/lib/api'
+import { formatCategoryName } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Upload, Camera, X, Package, CheckCircle2, Loader2, AlertCircle, Image as ImageIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -505,7 +506,7 @@ export default function NuevoProductoPage() {
                 >
                   <option value="">Sin categoría</option>
                   {categories.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                    <option key={c.id} value={c.id}>{formatCategoryName(c.name)}</option>
                   ))}
                 </select>
               </div>

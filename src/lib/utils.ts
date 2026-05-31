@@ -38,3 +38,13 @@ export const ORDER_STATUS_CONFIG = {
   delivered: { label: 'Entregado', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
   cancelled: { label: 'Cancelado', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
 } as const
+
+export function formatCategoryName(name: string | null | undefined): string {
+  if (!name) return 'Sin categoría'
+  const nameLower = name.trim().toLowerCase()
+  if (nameLower === 'mundo mágico' || nameLower === 'mundo magico') {
+    return 'Alta Costura'
+  }
+  return name
+}
+
